@@ -50,19 +50,21 @@ class GameLogic(ABC):
         return tuple(rand)                                     
 
 class Banker(ABC):
-
+   
     def __init__(self):
-        pass
+        self.balance=0
+        self.shelved=0
 
-    def shelf(amount):                  # input -> amount of point
-        pass                                # shelf should temporarily store unbanked points.
+    def shelf(self,amount):                  # input -> amount of point
+        self.shelved=amount                                # shelf should temporarily store unbanked points.
     
-    def bank():                             # The Total Points 
-        pass                                 # add the amount of shelf to the bank and clear shelf
+    def bank(self):                             # The Total Points 
+        self.balance+=self.shelved 
+        self.clear_shelf()                                # add the amount of shelf to the bank and clear shelf
                                             # output -> the total of Point 
     
-    def clear_shelf():                      #remove all unbanked points  //Falkel
-        pass
+    def clear_shelf(self):                      #remove all unbanked points  //Falkel
+        self.shelved=0
 
 
 
@@ -72,9 +74,8 @@ if __name__ == "__main__":
   
     greed = GameLogic()
     tuple2 = (5,)
-    # print(tuple2)
-    # print(greed.calculate_score(tuple2))
     print(GameLogic.roll_dice())
     print(GameLogic.roll_dice(2))
     print(GameLogic.roll_dice(5))
     print(GameLogic.roll_dice(6))
+    print(dir(Banker))
