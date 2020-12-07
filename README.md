@@ -22,3 +22,27 @@ The PR Link [PR](https://github.com/aghyadalbalkhi-ASAC/Game_of_Greed/pull/3
 **Actual time needed to complete:** `5 H`
 
 **Write Down By @Aghyad Albalkhi - Sondos Al-braim - Rand AlSallaq**
+
+<hr>
+
+
+The PR Link [PR](https://github.com/aghyadalbalkhi-ASAC/Game_of_Greed/pull/5
+)
+
+## Number and name of feature: Lab: 07 - Game of Greed II
+
+*This Lab is about creating a game*
+
+- Create a game.py
+- flow Testing
+
+
+**Estimate of time needed to complete:** `2 H`
+
+**Start time:** `2:00 pm`
+
+**Finish time:** `5:01 pm`
+
+**Actual time needed to complete:** `3 H`
+
+**Write Down By @Aghyad Albalkhi - Sondos Al-braim - Rand AlSallaq**
