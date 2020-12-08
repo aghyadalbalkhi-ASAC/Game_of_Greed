@@ -60,7 +60,7 @@ class Banker(ABC):
     
     def bank(self):                             # The Total Points 
         self.balance+=self.shelved 
-        self.clear_shelf()                                # add the amount of shelf to the bank and clear shelf
+        self.clear_shelf()                                        # add the amount of shelf to the bank and clear shelf
                                             # output -> the total of Point 
     
     def clear_shelf(self):                      #remove all unbanked points  //Falkel
