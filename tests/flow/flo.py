@@ -78,7 +78,7 @@ class Flo:
             print_lines = self.prints.strip().split("\n")
 
             file_lines = file.read().strip().split("\n")
-
+            
             assert len(print_lines) == len(file_lines)
 
             pairs = zip(print_lines, file_lines)

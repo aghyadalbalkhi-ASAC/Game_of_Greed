@@ -19,7 +19,7 @@ class GameLogic(ABC):
             5:{1:50,2:100,3:500,4:1000,5:1500,6:2000},
             6:{1:0,2:0,3:600,4:1200,5:1800,6:2400},
             7:1500,                                                   #stight
-            8:750                                                     #three pairs
+            8:1500                                                     #three pairs
     }                                                             #input -> tuple(integers) 
         counter = Counter(tupleInt)
         result= counter.most_common()                             # output -> integer depend on the rules
@@ -56,7 +56,7 @@ class Banker(ABC):
         self.shelved=0
 
     def shelf(self,amount):                  # input -> amount of point
-        self.shelved=amount                                # shelf should temporarily store unbanked points.
+        self.shelved+=amount                                # shelf should temporarily store unbanked points.
     
     def bank(self):                             # The Total Points 
         self.balance+=self.shelved 
