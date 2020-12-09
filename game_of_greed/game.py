@@ -6,17 +6,21 @@ class Game:
     def __init__(self, roller=None):
         self.roller = roller or GameLogic.roll_dice
 
-    def new_round(self,remaining_dice,round):
+    @staticmethod
+    def new_round(remaining_dice,round):
         print(f'Starting round {round}')
         print(f'Rolling {remaining_dice} dice...')
+    
+    def rolling(self,remaining_dice):
         roll = self.roller(remaining_dice)
         #roll=GameLogic.roll_dice(remaining_dice)
         print(','.join([str(i) for i in roll]))
-        #check the zilch
-        if round ==1:
-            if Game.zilch(round,roll,0):
-                return ' ',self.roller(6)
-        return input('Enter dice to keep (no spaces), or (q)uit: '),roll
+        return roll
+
+    @staticmethod
+    def user_input():
+        return input('Enter dice to keep (no spaces), or (q)uit: ')
+    
     @staticmethod
     def quit_game(score):
         print(f'Total score is {score} points')
@@ -24,8 +28,9 @@ class Game:
 
     @staticmethod
     def convert_input_to_tuple(user_input):
-            digits = [int(x) for x in str(user_input)]
-            return tuple(digits)
+        digits = [int(x) for x in str(user_input)]
+        return tuple(digits)
+
 
     @staticmethod
     def cheatting(rolled,input):
@@ -38,14 +43,26 @@ class Game:
             except ValueError:
                 return True
         return False
+
     @staticmethod
-    def zilch(round,roll,bank=0):
-        if GameLogic.calculate_score(roll)==0:
+    def zilch(round,roll,bank=0,remaining_dice=0):
+        if GameLogic.calculate_score(roll)==0 or remaining_dice==0:
             print('Zilch!!! Round over')
             print(f'You banked 0 points in round {round}')
             print(f'Total score is {bank} points')
             return True
         return False
+
+    @staticmethod
+    def unbankmsg(shelved,remaining_dice):
+        if shelved ==1500:
+            remaining_dice=0
+        print(f"You have {shelved} unbanked points and {str(remaining_dice)} dice remaining")
+
+    @staticmethod
+    def action():
+        return input('(r)oll again, (b)ank your points or (q)uit ')
+
 
     def play(self):
         nope_player = Banker()
@@ -54,81 +71,82 @@ class Game:
         if res == 'n':
             print('OK. Maybe another time')
 
+        elif res == 'y':
+            remaining_dice =6
+            round =1
+            user_input=' '
+            action_status = True
+            EndOfGame=True
+            while EndOfGame:
 
-        elif res == 'y':                                   # we have to path [new round - current round]
-            
-            #initializing Variable
-            round = 1
-            remaining_dice = 6
-            new_round= True
+                if action_status:
+                    # Starting New Round
+                    remaining_dice=6
+                    Game.new_round(remaining_dice,round)
+                    roll=self.rolling(remaining_dice)
 
-            #looping until reach break ('q')
-            while True:
-
-                # run this code if we are in a new round                                     
-                if new_round ==True:
-                    remaining_dice=6                        
-                    dice_to_keep,rolled=self.new_round(remaining_dice,round)
+                while Game.zilch(round,roll,nope_player.balance,remaining_dice):
                     round+=1
-                    #check the zilch
-                if Game.zilch(round,rolled,nope_player.balance):
-                    round+=1
-                else:
+                    Game.new_round(remaining_dice,round)
+                    roll=self.rolling(remaining_dice)
+                    Game.zilch(round,roll,nope_player.balance,remaining_dice)
 
-                    # handeling the Integers -> If Not Integers handel execep where the inpu is string ['q' - 'b']
-                    try:            
-                        user_aside=Game.convert_input_to_tuple(dice_to_keep)
+                user_choice=Game.user_input()
+                if user_choice =='q':
+                    Game.quit_game(nope_player.balance)
+                    break
 
-                        #checking cheat
-                        cheat = Game.cheatting(rolled,user_aside)
-                        while cheat:
-                            print('Cheater!!! Or possibly made a typo...')
-                            print(','.join([str(i) for i in rolled]))
-                            dice_to_keep= input('Enter dice to keep (no spaces), or (q)uit: ')
-                            user_aside=Game.convert_input_to_tuple(dice_to_keep)
-                            cheat = Game.cheatting(rolled,user_aside)
 
-                        nope_player.shelf(GameLogic.calculate_score(user_aside))
+                if user_choice.isdigit():
+                    user_aside =Game.convert_input_to_tuple(int(user_choice))
 
-                        # decrese The Remainig Dice
-                        if GameLogic.calculate_score(user_aside) ==1500:
-                            remaining_dice=6
-                            print(f"You have {nope_player.shelved} unbanked points and 0 dice remaining")
+                    cheat = Game.cheatting(roll,user_aside)
+                    while cheat:
+                        print('Cheater!!! Or possibly made a typo...')
+                        print(','.join([str(i) for i in roll]))
+                        user_choice=Game.user_input()
+                        if user_choice.isdigit():
+                            user_aside =Game.convert_input_to_tuple(int(user_choice))
+                        cheat = Game.cheatting(roll,user_aside)
 
-                        else:
-                            remaining_dice-=len(dice_to_keep)
-                            print(f"You have {nope_player.shelved} unbanked points and {remaining_dice} dice remaining")
-                        dice_to_keep= input('(r)oll again, (b)ank your points or (q)uit ')
+                    nope_player.shelf(GameLogic.calculate_score(user_aside))
 
-                        # To Prevent handel the new_round msg when back to hande ['b' or 'q']
-                        if dice_to_keep == 'b' or dice_to_keep =='q' or dice_to_keep =='r' :
-                            new_round =False
-                    except ValueError:
-                        if dice_to_keep == 'b':
-                            current_round=round-1
-                            print(f'You banked {nope_player.shelved} points in round {current_round}')
+                    Game.unbankmsg(nope_player.shelved,remaining_dice-len(user_choice))
+                    if nope_player.shelved == 1500:
+                        remaining_dice=6
+                        user_choice=''
+                    action= Game.action()
+                while True :
+                    if action == 'b':
+                            print(f'You banked {nope_player.shelved} points in round {round}')
                             nope_player.bank()
                             print(f'Total score is {nope_player.balance} points')
-                            new_round=True
-                            remaining_dice=6
-
-                        if dice_to_keep == 'r':
-                            print(f'Rolling {remaining_dice} dice...')
-                            rolled = self.roller(remaining_dice)
-                            if len(str(rolled)) ==1:
-                                rolled= () + (rolled,) 
-                            print(','.join([str(i) for i in rolled]))
-                            # print(round,rolled,nope_player.balance,"top")
-                            if Game.zilch(round-1,rolled,nope_player.balance):
-                                new_round=True
-                            else:
-                                dice_to_keep =input('Enter dice to keep (no spaces), or (q)uit: ')
-
-
-                        if dice_to_keep == 'q':
-                            Game.quit_game(nope_player.balance)
+                            round +=1
+                            action_status = True
                             break
 
+                    elif action == 'r':
+                        action_status = False
+                        print(f'Rolling {remaining_dice-len(user_choice)} dice...')
+                        roll=self.rolling(remaining_dice-len(user_choice))
+
+                        while Game.zilch(round,roll,nope_player.balance,remaining_dice):
+                            round+=1
+                            remaining_dice=6
+                            Game.new_round(remaining_dice,round)
+                            roll=self.rolling(remaining_dice)
+                            Game.zilch(round,roll,nope_player.balance,remaining_dice)
+                        remaining_dice = remaining_dice-len(user_choice)
+                        break
+                    
+                    if action == 'q':
+                        Game.quit_game(nope_player.balance)
+                        action_status=False
+                        EndOfGame=False
+                        break
+
+        else:
+            print('Enter Yes (yn) or No (n)')
 
 if __name__ == '__main__':
     game = Game()
