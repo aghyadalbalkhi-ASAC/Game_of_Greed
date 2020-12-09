@@ -9,5 +9,4 @@ def test_living_on_the_edge():
 def test_hot_dice():
     Flo.test('tests/flow/hot_dice.txt')
 
-def test_zilch():
-    Flo.test('tests/flow/zilch.txt')
+
